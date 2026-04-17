@@ -1,0 +1,668 @@
+﻿<style>
+    #enquiryfollowup-table-parent .subtotal {
+        font-weight: bold;
+        background: #fff3cd;
+        color: #b65c00;
+    }
+    .summary-row-selected{
+        background-color: #ffecb2!important;
+    }
+
+    #enquiryfollowup-base-table-view{
+        width: 50%;
+        height: calc(100vh - 85px);
+        position: relative; /* ensure the loader positions relative to this */
+    }
+
+    #enquiryfollowup-loader {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center; /* horizontal center */
+        align-items: center; /* vertical center */
+        background: rgba(255, 255, 255, 0); /* slight white overlay */
+        z-index: 999;
+    }
+
+    #enquiryfollowup-loader img {
+        width: 48px;
+        height: 48px;
+    }
+
+    #enquiryfollowup-history-view {
+        width: 50%;
+        height: calc(100vh - 85px);
+    }
+
+    #enquiryfollowup-base-table-parent{
+        overflow: auto;
+        height: calc(100vh - 220px);
+    }
+
+    #enquiryfollowuphistory-table-parent{
+        overflow: auto;
+        height: calc(100vh - 130px);
+    }
+
+    #msg-resultbox, #pop-filterbox {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 2000; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    #msg-resultbox .popup-content, #pop-filterbox .popup-content {
+        background-color: #fefefe;
+        margin: auto;
+        border: 1px solid #888;
+        --width: 80%;
+        max-width: 400px;
+        position: relative;
+        top: 40px;
+        border-radius: 12px 12px 10px 10px;
+    }
+
+  
+    /* The Close Button */
+    #msg-resultbox .popup-close-filter, #pop-filterbox .popup-close-filter {
+        color: #949494;
+        float: right;
+        font-size: 20px;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    #msg-resultbox-heading, #pop-filterbox-heading {
+        font-weight: 600;
+        color: white;
+        font-size: 15px;
+        padding: 10px;
+    }
+
+    #msg-resultbox .popup-close-filter:hover,
+    #msg-resultbox .popup-close-filter:focus, #pop-filterbox .popup-close-filter:hover,
+    #pop-filterbox .popup-close-filter:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #msg-resultbox-heading, #pop-filterbox-heading {
+        font-weight: 600;
+        color: black;
+        padding: 10px;
+    }
+
+    #msg-resultbox-heading-top-section, #pop-filterbox-heading-top-section {
+        padding: 15px 15px 0px 15px;
+    }
+
+    #msg-resultbox-submit, #pop-filterbox-submit {
+        color: white;
+        font-weight: 700;
+        min-width: 100px;
+        border-radius: 5px;
+        padding: 2px;
+        border: none;
+    }
+
+    #pop-filterbox-clear {
+        color: white;
+        font-weight: 700;
+        min-width: 100px;
+        border-radius: 5px;
+        padding: 2px;
+        border: none;
+        margin-left: 10px;
+    }
+
+    #msg-resultbox-body-section, #pop-filterbox-body-section {
+        padding: 10px 25px 5px;
+    }
+
+   
+    #msg-resultbox-submit-section, #pop-filterbox-submit-section {
+        display: flex;
+        flex-direction: row;
+        padding: 10px 25px 15px;
+    }
+
+    #enquiryfollowup-history-view{
+        width: 50%;
+    }
+
+    .summary-customer-address{
+        font-size: 11px;
+    }
+
+    #enquiryfollowup-base-table-view-inner{
+        padding: 1.5rem 0rem 1.5rem 1.5rem;
+    }
+
+    .customer-col-style {
+        min-width: 200px;
+        max-width: 200px;
+    }
+
+    .summary-row, .t-row {
+        cursor: pointer;
+    }
+
+    .summary-row:hover, .t-row:hover {
+        background-color: #dadada;
+    }
+
+    
+    #enquiryfollowup-history-table-parent{
+        max-height: 270px;
+        overflow-y: auto;
+    }
+
+    #basefilter-buttons{
+        padding: 5px;
+    }
+    .basefilter-btn{
+        padding: 5px 10px;
+        border-radius: 5px 5px 0px 0px;
+    }
+
+    .basefilter-btn:hover {
+        background-color: #8080803b;
+    }
+    .basefilter-btn.active{
+        color: black;
+        font-weight: 600;
+        border-bottom: 2px solid black;
+        background-color: #8080803b;
+    }
+
+    .summary-details-enqno, .summary-customer-billamt, .summary-customer-nextfollowup {
+        text-align: right;
+    }
+
+    .history-item{
+        margin-bottom: 10px;
+        border-bottom: 2px solid red;
+    }
+    .history-item-top-section{
+        display: flex;
+        justify-content:flex-start;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .history-top-content{
+        margin-left: 10px;
+    }
+    .history-top-img img{
+        width: 40px;
+        height: 40px;
+    }
+
+    .history-item-mid-section{
+        margin-bottom: 10px;
+    }
+
+    .history-item-mid-section table{
+        width: 100%;
+    }
+    .enq-item-detail-val-total{
+        color: green;
+    }
+
+    .history-item-comment-section{
+        padding: 15px;
+        background-color: #ff000029;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    .history-img-section{
+        max-height: 300px;
+    }
+    .history-img-section img{
+            max-height: 300px;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+    }
+
+    .enqitem{
+        margin-bottom: 10px;
+        background-color: #0080001c;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .enq-item-detail-tile{
+        display: flex;
+        justify-content: space-between;
+        text-align: center;
+    }
+</style>
+
+<script src="~/lib/tailwind/tailwind.js"> </script>
+
+<div id="id-parent-enquiryfollowup">
+    <div id="msg-resultbox" class="msg-resultbox popup-parent">
+        <div class="popup-content">
+            <div class="baseflex" id="msg-resultbox-heading-top-section">
+                <div id="filter-heading-section" class="baseflex">
+                    <div id="msg-resultbox-heading"></div>
+                </div>
+                <span class="popup-close-filter" id="cls">&times;</span>
+            </div>
+            <div id="msg-resultbox-body-section" class="padding-10">
+            </div>
+            <div id="msg-resultbox-submit-section">
+                <button id="msg-resultbox-submit" class="themed-button">Ok</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="pop-filterbox" class="pop-filterbox popup-parent">
+        <div class="popup-content">
+            <div class="baseflex" id="pop-filterbox-heading-top-section">
+                <div id="filter-heading-section" class="baseflex">
+                    <div id="pop-filterbox-heading"></div>
+                </div>
+                <span class="popup-close-filter" id="cls">&times;</span>
+            </div>
+            <div id="pop-filterbox-body-section" class="padding-10">
+                <div class="mb-3">
+                    <label class="block text-red-600 font-semibold mb-1">From Date</label>
+                    <input id="fl-fromdate" type="date" class="w-full border border-blue-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 input-hover cursor-pointer" />
+                </div>
+                <div class="mb-3">
+                    <label class="block text-red-600 font-semibold mb-1">To Date</label>
+                    <input id="fl-todate" type="date" class="w-full border border-blue-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 input-hover cursor-pointer" />
+                </div>
+                <div class="mb-3 position-relative">
+                    <label class="block text-red-600 font-semibold mb-1">Status</label>
+                    <select id="fl-status" class="w-full border border-blue-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 input-hover cursor-pointer">
+                       <option value="1">Ongoing</option>
+                       <option value="2">Done</option>
+                       <option value="3">Lost</option>
+                   </select>
+                </div>
+                <div class="mb-3 position-relative">
+                    <label class="block text-red-600 font-semibold mb-1">Salesman/Rep</label>
+                    <select id="fl-salesman" class="w-full border border-blue-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 input-hover cursor-pointer">
+                        <option value="0">All</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-red-600 font-semibold mb-1">Customer/Phone</label>
+                    <input id="fl-customer" type="text" class="w-full border border-blue-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 input-hover cursor-pointer" />
+                </div>
+            </div>
+            <div id="pop-filterbox-submit-section">
+                <button id="pop-filterbox-submit" class="themed-button">Apply</button>
+                <button id="pop-filterbox-clear" class="themed-button">Clear</button>
+            </div>
+        </div>
+    </div>
+    <div id="initial-view">
+        <div class="disp-flex">
+            <div id="enquiryfollowup-base-table-view">
+                <div id="enquiryfollowup-base-table-view-inner">
+                    <div id="enquiryfollowup-loader">
+                        <img src="/icons/green-spinner.gif" alt="Loading..." />
+                    </div>
+                    <!-- Top Bar -->
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="text-xl font-semibold"><span>Enquiry Follow Up Report</span></div>
+                        <div class="flex items-center space-x-2">
+                            <button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600" id="btn-show-filters">Filter</button>
+                        </div>
+                    </div>
+                    <!-- Table -->
+                    <div class="enquiryfollowup-base-table-parent-container bg-white rounded shadow">
+                        <div id="basefilter-buttons"><button class="basefilter-btn active" data-filter-type="1">Today</button><button class="basefilter-btn" data-filter-type="2">Upcoming</button><button class="basefilter-btn" data-filter-type="3">Pending</button><button class="basefilter-btn" data-filter-type="0">All</button></div>
+                        <div id="enquiryfollowup-base-table-parent" class="">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <tbody class="divide-y divide-gray-100" id="enquiryfollowup-base-table-tbody">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="enquiryfollowup-history-view" class="p-4">
+                <div id="enquiryfollowuphistory-table-parent" class="overflow-x-auto bg-white rounded shadow">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        
+                        <tbody class="divide-y divide-gray-100" id="enquiryfollowuphistory-table-parent-tbody">
+                            
+
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    LoadSalesmanList();
+    function Initialize(){
+         var today = new Date().toISOString().split('T')[0];
+         $('#fl-date').val(today);
+    }
+    InitializeFilters();
+    function InitializeFilters(){
+         var today = new Date().toISOString().split('T')[0];
+         $('#fl-fromdate').val(today);
+         $('#fl-todate').val(today);
+         $('#fl-status').val(1);
+         $('#fl-salesman').val(0);
+         $('#fl-customer').val('');
+    }
+    function LoadSalesmanList(){
+        var apiData = {
+            CompanyId: 1,
+            BranchId: $('#branch-selector').val(),
+            YearCode: $('#financial-year-selector').val(),
+            UserId: ScriptUser.USERID
+        }
+
+        $.ajax({
+            url: RequestBasePath + '/EnquiryFollowUp/GetSalesmanLookup',
+            type: 'Post',
+            data: { strdata: JSON.stringify(apiData) },
+            success: function (data) {
+                var outData = JSON.parse(data);
+                RenderSalesmanList(outData["SalesMan"]);
+            },
+            error: function (jqXHR, exception) {
+                console.log(jqXHR);
+                console.log(exception);
+            },
+        });
+    }
+    function RenderSalesmanList(data){
+        console.log(data);
+        $('#fl-salesman').html('<option value="0">All</option>')
+        for(var i = 0; i < data.length; i++){
+            var element = "<option value='"+ data[i]["SalesManId"] +"'>"+ data[i]["SalesMan"] +"</option>";
+            $('#fl-salesman').append(element)
+        }
+    }
+    $('#pop-filterbox-clear').on('click', function(){
+       InitializeFilters();
+    });
+    $('#pop-filterbox-submit').on('click', function(){
+        GetEnquiryFollowUpSummaryReport();
+    });
+    
+    function showLoader() {
+        $('#enquiryfollowup-loader').css('display', 'flex');
+    }
+    function hideLoader() {
+        $('#enquiryfollowup-loader').css('display', 'none');
+    }
+    GetEnquiryFollowUpSummaryReport();
+   
+    $(document).on("click", ".basefilter-btn", function(){
+        $(".basefilter-btn").removeClass("active");
+        $(this).addClass("active");
+        GetEnquiryFollowUpSummaryReport();
+    });
+    function GetEnquiryFollowUpSummaryReport() {
+        var tbody = $("#enquiryfollowup-base-table-parent tbody");
+        tbody.empty();
+        var tbodyhistory = $("#enquiryfollowuphistory-table-parent-tbody");
+        tbodyhistory.empty();
+        showLoader();
+       
+        var _FromDate = GetDate_YYYYMMDD($('#fl-fromdate').val());
+        var _ToDate = GetDate_YYYYMMDD($('#fl-todate').val());
+        var _Status = $('#fl-status').val();
+        var _TypeId = $(".basefilter-btn.active").data("filter-type");
+        var _Salesman = $("#fl-salesman").val();
+        var _Customer = $("#fl-customer").val();
+        //10000761
+        var apiData = {
+            BranchId: $('#branch-selector').val(),
+            YearCode: $('#financial-year-selector').val(),
+            salesmanorrepcode: _Salesman,
+            TypeId: _TypeId,
+            countlist: 0,
+            sfromDate: _FromDate,
+            stoDate: _ToDate,
+            CustomerCode: 0,
+            issearch: 0,
+            statusid: _Status,
+            custname: _Customer
+        }
+
+        $.ajax({
+            url: RequestBasePath + '/EnquiryFollowUp/GetEnquiryFollowUpSummaryReport',
+            type: 'Post',
+            data: { strdata: JSON.stringify(apiData) },
+            success: function (data) {
+                var outData = JSON.parse(data);
+                hideLoader();
+                RenderEnquiryFollowUpSummaryReport(outData);
+                $('#pop-filterbox').hide();
+            },
+            error: function (jqXHR, exception) {
+                console.log(jqXHR);
+                console.log(exception);
+            },
+        });
+    }
+    function RenderEnquiryFollowUpSummaryReport(data){
+        var tbody = $("#enquiryfollowup-base-table-parent tbody");
+        tbody.empty();
+
+        var tbodydetailed = $("#enquiryfollowup-table-parent tbody");
+        tbodydetailed.empty();
+        
+        if(data != null && data.length > 0){
+            for(var i = 0; i < data.length; i++){
+               var element = "<tr class='summary-row t-row list-view-item-row' data-orderno='" + data[i]["orderno"] +"' data-branchid='" + data[i]["branchid"] +"' data-yearcode='" + data[i]["yearcode"] +"'><td class='px-4 py-2' style='white-space: nowrap;'>" + data[i]["entrydate"] + "</td><td class='px-4 py-2 customer-col-style' ><div><div class='summary-customer-name'>" + data[i]["customer"] + "</div><div class='summary-customer-address'>" + data[i]["address1"] + "</div><div class='summary-customer-status'>" + data[i]["enquirystatus"] + "</div><div class='summary-customer-status'>Next Followed By: <span style='color:red;'>" + data[i]["assignedto"] + "</span<</div></div></td><td class='px-4 py-2' style='white-space: nowrap;'><div><div class='summary-details-enqno'>Enq.No: " + data[i]["orderno"] + "</div><div class='summary-customer-billamt'>BL: " + data[i]["billamount"] + "</div><div class='summary-customer-nextfollowup'>Next Followup: " + data[i]["followupdate"] + "</div></div></td></tr>";
+               $("#enquiryfollowup-base-table-parent tbody").append(element);
+            }
+
+            var $rows = $("#enquiryfollowup-base-table-parent tbody tr");
+            if ($rows.length > 0 && data.length) {
+                $rows.first().trigger("click");
+            }
+        }
+        else
+        {
+             var element = "<tr class='t-row list-view-item-row'><td class='px-4 py-2' colspan='3'>No data found.</td></tr>";
+               $("#enquiryfollowup-base-table-parent tbody").append(element);
+        }
+    }
+    $(document).on("click", ".summary-row", function () {
+        $(".summary-row").removeClass("summary-row-selected");
+        $(this).addClass("summary-row-selected");
+        var _OrderNo = $(this).attr('data-orderno');
+        var _BranchId = $(this).attr('data-branchid');
+        var _YearCode = $(this).attr('data-yearcode');
+        GetEnquiryFollowUpHistory(_OrderNo, _BranchId, _YearCode);
+    });
+     
+    function GetEnquiryFollowUpHistory(_OrderNo, _BranchId, _YearCode) {
+        var tbodyhistory = $("#enquiryfollowuphistory-table-parent-tbody");
+        tbodyhistory.empty();
+
+        var apiData = {
+            BranchId: _BranchId,
+            YearCode: _YearCode,
+            orderNo :_OrderNo
+        }
+
+        $.ajax({
+            url: RequestBasePath + '/EnquiryFollowUp/GetEnquiryFollowUpHistoryReport',
+            type: 'Post',
+            data: { strdata: JSON.stringify(apiData) },
+            success: function (data) {
+                var outData = JSON.parse(data);
+                hideLoader();
+                RenderEnquiryFollowUpHistoryReport(outData);
+                $('#pop-filterbox').hide();
+            },
+            error: function (jqXHR, exception) {
+                console.log(jqXHR);
+                console.log(exception);
+            },
+        });
+    }
+    function RenderEnquiryFollowUpHistoryReport(data){
+       
+        var tbodydetailed = $("#enquiryfollowuphistory-table-parent-tbody");
+        tbodydetailed.empty();
+        if(data != null && data.length > 0){
+            for(var i = 0; i < data.length; i++){
+                if(data[i]["id"] == "B"){
+                     var element = `<tr class='hover:bg-gray-50 history-item'>
+                                <td class='px-4 py-2'>
+                                    <div class='history-item-top-section'>
+                                        <div class='history-top-img'><img src='Images/user.png' alt='user image' /></div>
+                                        <div class='history-top-content'>Update Followup Enquiry by <strong>`+ data[i]["donebyuser"] +` on `+ data[i]["createddatetimeformat"] +`</strong></div>
+                                    </div>
+                                    <div class='history-item-mid-section'>
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <tbody class="divide-y divide-gray-100">
+                                                <tr class="t-row list-view-item-row hover:bg-gray-50">
+                                                    <td class="px-4 py-2">Follow Up Date</td>
+                                                    <td class="px-4 py-2">`+ data[i]["followupdate"]+`</td>
+                                                </tr>
+                                                <tr class="t-row list-view-item-row hover:bg-gray-50">
+                                                    <td class="px-4 py-2">Follow Up Status</td>
+                                                    <td class="px-4 py-2">`+ data[i]["followupstatus"]+`</td>
+                                                </tr>
+                                                <tr class="t-row list-view-item-row hover:bg-gray-50">
+                                                    <td class="px-4 py-2">Follow Up Type</td>
+                                                    <td class="px-4 py-2">`+ data[i]["followuptype"]+`</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    `;
+                                    if(data[i]["remarks"] != "" && data[i]["remarks"] != NaN){
+                                        element += `<div class="history-item-comment-section">
+                                        `+ data[i]["remarks"] +`
+                                        </div>`;
+                                    }
+                                    if(data[i]["photo1"] != ""){
+                                        element += `<div class="history-img-section">
+                                            <img src="`+data[i]["photo1"]+`" />
+                                         </div>`;
+                                    }
+                                element += `</td>
+                            </tr>`;
+                             $("#enquiryfollowuphistory-table-parent-tbody").append(element);
+               }
+               else
+               {
+                   console.log(data[i]["CrmFollowUpItemListModel"])
+                   console.log(data[i]["CrmFollowUpItemListModel"].length)
+                   var element = `<tr class='hover:bg-gray-50 history-item'>
+                                <td class='px-4 py-2'>
+                                    <div class='history-item-top-section'>
+                                        <div class='history-top-img'><img src='Images/user.png' alt='user image' /></div>
+                                        <div class='history-top-content'>Enquiry added <strong>on `+ data[i]["createddatetimeformat"] +`</strong></div>
+                                    </div>
+                                    <div class='history-item-mid-section'>
+                                        <div><strong>Items</strong></div>
+                                        <div class="history-enqitem-container">`;
+                                            for(var j = 0; j < data[i]["CrmFollowUpItemListModel"].length; j++){
+                                                console.log(data[i]["CrmFollowUpItemListModel"][j])
+                                            element += `<div class="enqitem">
+                                                <div><strong>`+data[i]["CrmFollowUpItemListModel"][j]["itemname"]+`</strong></div>
+                                                <div class="enq-item-detail-tile">
+                                                    <div>
+                                                        <div class="enq-item-detail-label">Qty</div>
+                                                        <div class="enq-item-detail-val-qty"><strong>`+data[i]["CrmFollowUpItemListModel"][j]["qty"]+`</strong></div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="enq-item-detail-label">Rate</div>
+                                                        <div class="enq-item-detail-val-rate"><strong>`+data[i]["CrmFollowUpItemListModel"][j]["rate"]+`</strong></div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="enq-item-detail-label">Rate</div>
+                                                        <div class="enq-item-detail-val-total"><strong>`+data[i]["CrmFollowUpItemListModel"][j]["nettotal"]+`</strong></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            `}
+
+                                            
+                                         element += `</div>
+
+                                    </div>
+                                </td>
+                            </tr>`;
+                             $("#enquiryfollowuphistory-table-parent-tbody").append(element);
+               }
+
+              
+            }
+        }
+        else
+        {
+             var element = "<tr class='t-row list-view-item-row'><td class='px-4 py-2' colspan='3'>No data found.</td></tr>";
+              $("#enquiryfollowuphistory-table-parent-tbody").append(element);
+        }
+    }
+    function formatDate(dateStr) {
+        if (!dateStr) return "";
+        const date = new Date(dateStr);
+        if (isNaN(date)) return dateStr; // if invalid date string
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    }
+    
+    
+    $('#msg-resultbox-submit').click(function (event) {
+        event.stopImmediatePropagation();
+        $(this).parent().parent().parent().hide();
+        GetenquiryfollowupReport();
+    });
+    $('#msg-resultbox .popup-close-filter').on('click', function(event){
+        event.stopImmediatePropagation();
+        $('#msg-resultbox').hide();
+        GetenquiryfollowupReport();
+    });
+  
+    $('#btn-show-filters').on('click', function(){
+        $('#pop-filterbox').show();
+    });
+    
+    $('#pop-filterbox .popup-close-filter').on('click', function(event){
+        event.stopImmediatePropagation();
+        $('#pop-filterbox').hide();
+    });
+    
+    //Common functions
+    function GetDate_YYYYMMDD(val) {
+        if (!val) return '';
+
+        var d = new Date(val);
+        if (isNaN(d)) return '';
+
+        return d.getFullYear() + '-' +
+            ('0' + (d.getMonth() + 1)).slice(-2) + '-' +
+            ('0' + d.getDate()).slice(-2);
+    }
+  
+</script>

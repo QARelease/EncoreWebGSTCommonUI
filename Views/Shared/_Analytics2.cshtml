@@ -1,0 +1,673 @@
+﻿﻿
+<style>
+    :root {
+        --bg: #f4f6fb;
+        --card: #ffffff;
+        --text: #1f2a37;
+        --muted: #6b7280;
+        --line: #e7ebf3;
+        --blue: #2f7cf6;
+        --blue-2: #69a7ff;
+        --green: #22c55e;
+        --amber: #f59e0b;
+        --red: #ef4444;
+        --shadow: 0 10px 30px rgba(31,42,55,.08);
+        --radius: 14px;
+    }
+
+    * {
+        box-sizing: border-box
+    }
+
+    body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, "Noto Sans", "Liberation Sans", sans-serif;
+        color: var(--text);
+        background: radial-gradient(900px 450px at 20% 10%, #e9f1ff 0%, rgba(233,241,255,0) 70%), radial-gradient(900px 450px at 90% 0%, #efeaff 0%, rgba(239,234,255,0) 60%), var(--bg);
+    }
+
+    .wrap {
+        --max-width: 1180px;
+        margin: 26px auto;
+        padding: 0 18px 34px;
+    }
+
+   
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 14px;
+    }
+
+    .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .card-pad {
+        padding: 14px 16px;
+    }
+
+    /* ---- Top summary cards ---- */
+    .summary {
+        grid-column: span 3;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-height: 86px;
+    }
+
+        .summary .label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #3b4556;
+            opacity: .9;
+        }
+
+        .summary .value {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .summary .amt {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+
+        .summary .sub {
+            font-size: 12px;
+            color: var(--muted);
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        border: 1px solid var(--line);
+        background: #fbfcff;
+    }
+
+        .pill.green {
+            color: #0b7a2a;
+            background: #eafaf0;
+            border-color: #c9f1d6;
+        }
+
+        .pill.amber {
+            color: #8a5a00;
+            background: #fff6e6;
+            border-color: #ffe2b4;
+        }
+
+        .pill.red {
+            color: #8a1111;
+            background: #ffeaea;
+            border-color: #ffc2c2;
+        }
+
+    /* ---- Section headers ---- */
+    .card-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+    }
+
+        .card-head h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 800;
+            color: #2b3443;
+        }
+
+        .card-head .meta {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+    /* ---- Layout blocks ---- */
+    .trend {
+        grid-column: span 7;
+    }
+
+    .stock {
+        grid-column: span 5;
+    }
+
+    .aging {
+        grid-column: span 7;
+    }
+
+    .insights {
+        grid-column: span 5;
+    }
+
+    .table {
+        grid-column: span 12;
+    }
+
+    /* ---- Chart helpers ---- */
+    .chart {
+        padding: 10px 12px 12px;
+    }
+
+    .svg {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .legend {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        padding: 0 16px 12px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+        display: inline-block;
+        margin-right: 6px;
+    }
+
+    /* ---- Insights list ---- */
+    .insight-list {
+        padding: 12px 16px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .insight {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fbfcff;
+    }
+
+    .warn {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        background: #fff6e6;
+        border: 1px solid #ffe2b4;
+        color: #8a5a00;
+        font-weight: 900;
+        flex: 0 0 auto;
+    }
+
+    .insight p {
+        margin: 2px 0 0;
+        font-size: 13px;
+        color: #3b4556;
+        font-weight: 650;
+    }
+
+    /* ---- Table ---- */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    thead th {
+        text-align: left;
+        padding: 12px 14px;
+        color: #3b4556;
+        font-weight: 800;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+    }
+
+    tbody td {
+        padding: 11px 14px;
+        border-bottom: 1px solid var(--line);
+        color: #2b3443;
+        font-weight: 650;
+    }
+
+    tbody tr:hover td {
+        background: #fbfcff;
+    }
+
+    .risk {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 800;
+        color: #3b4556;
+    }
+
+        .risk .r-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: var(--muted);
+        }
+
+        .risk.high .r-dot {
+            background: var(--red);
+        }
+
+        .risk.med .r-dot {
+            background: var(--amber);
+        }
+
+        .risk.low .r-dot {
+            background: var(--green);
+        }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: #f7faff;
+        font-weight: 800;
+        font-size: 12px;
+        color: #1f3b7a;
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .btn.call {
+            background: #eaf2ff;
+            border-color: #cfe0ff;
+            color: #1b4fbf;
+        }
+
+        .btn.follow {
+            background: #fff6e6;
+            border-color: #ffe2b4;
+            color: #8a5a00;
+        }
+
+        .btn.remind {
+            background: #eafaf0;
+            border-color: #c9f1d6;
+            color: #0b7a2a;
+        }
+
+    /* ---- Responsiveness ---- */
+    @@media (max-width: 1020px) {
+        .summary
+
+    {
+        grid-column: span 6;
+    }
+
+    .trend, .aging {
+        grid-column: span 12;
+    }
+
+    .stock, .insights {
+        grid-column: span 12;
+    }
+
+    }
+    @@media (max-width: 560px) {
+        .summary
+
+    {
+        grid-column: span 12;
+    }
+
+    .title {
+        font-size: 24px;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tbody tr {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    tbody td {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+        tbody td::before {
+            content: attr(data-label);
+            color: var(--muted);
+            font-weight: 800;
+        }
+
+    }
+</style>
+
+<h1>test1</h1>
+<div id="id-parent-analytics">
+    <div class="wrap">
+        <div class="text-xl font-semibold mb-3"><span>Enquiry Follow Up Report</span></div>
+
+        <div class="grid">
+            <!-- Summary Cards -->
+            <div class="card summary card-pad">
+                <div class="label">Total Sales This Month</div>
+                <div class="value">
+                    <div class="amt">₹18,45,000</div>
+                    <span class="pill green">▲ 12%</span>
+                </div>
+            </div>
+
+            <div class="card summary card-pad">
+                <div class="label">Expected Cash Inflow</div>
+                <div class="value">
+                    <div class="amt">₹12,80,000</div>
+                    <div class="sub">Due Soon</div>
+                </div>
+            </div>
+
+            <div class="card summary card-pad">
+                <div class="label">Low Stock Items</div>
+                <div class="value">
+                    <div class="amt">5</div>
+                    <span class="pill amber">Critical Items</span>
+                </div>
+            </div>
+
+            <div class="card summary card-pad">
+                <div class="label">Receivables At Risk</div>
+                <div class="value">
+                    <div class="amt" style="color:var(--red)">₹4,75,000</div>
+                    <div class="sub" style="color:#b42318;font-weight:800;">High Risk</div>
+                </div>
+            </div>
+
+            <!-- Sales Trend -->
+            <div class="card trend">
+                <div class="card-head">
+                    <h3>Sales Trend <span class="meta">(Last 12 Months)</span></h3>
+                </div>
+                <div class="chart">
+                    <!-- Simple SVG line chart (no JS needed) -->
+                    <svg class="svg" viewBox="0 0 760 260" role="img" aria-label="Sales Trend chart">
+                        <!-- Grid -->
+                        <defs>
+                            <linearGradient id="fillBlue" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#2f7cf6" stop-opacity="0.25" />
+                                <stop offset="100%" stop-color="#2f7cf6" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                        <rect x="0" y="0" width="760" height="260" fill="#ffffff" />
+                        <g stroke="#e7ebf3" stroke-width="1">
+                            <line x1="50" y1="40" x2="740" y2="40" />
+                            <line x1="50" y1="90" x2="740" y2="90" />
+                            <line x1="50" y1="140" x2="740" y2="140" />
+                            <line x1="50" y1="190" x2="740" y2="190" />
+                            <line x1="50" y1="240" x2="740" y2="240" />
+
+                            <line x1="50" y1="40" x2="50" y2="240" />
+                            <line x1="146" y1="40" x2="146" y2="240" />
+                            <line x1="242" y1="40" x2="242" y2="240" />
+                            <line x1="338" y1="40" x2="338" y2="240" />
+                            <line x1="434" y1="40" x2="434" y2="240" />
+                            <line x1="530" y1="40" x2="530" y2="240" />
+                            <line x1="626" y1="40" x2="626" y2="240" />
+                            <line x1="740" y1="40" x2="740" y2="240" />
+                        </g>
+
+                        <!-- Area fill -->
+                        <path d="M 50 190
+                     L 146 170
+                     L 242 165
+                     L 338 145
+                     L 434 125
+                     L 530 95
+                     L 626 110
+                     L 740 100
+                     L 740 240
+                     L 50 240 Z"
+                              fill="url(#fillBlue)" />
+
+                        <!-- Line -->
+                        <path d="M 50 190
+                     L 146 170
+                     L 242 165
+                     L 338 145
+                     L 434 125
+                     L 530 95
+                     L 626 110
+                     L 740 100"
+                              fill="none" stroke="#2f7cf6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+                        <!-- Points -->
+                        <g fill="#ffffff" stroke="#2f7cf6" stroke-width="3">
+                            <circle cx="50" cy="190" r="6" />
+                            <circle cx="146" cy="170" r="6" />
+                            <circle cx="242" cy="165" r="6" />
+                            <circle cx="338" cy="145" r="6" />
+                            <circle cx="434" cy="125" r="6" />
+                            <circle cx="530" cy="95" r="6" />
+                            <circle cx="626" cy="110" r="6" />
+                            <circle cx="740" cy="100" r="6" />
+                        </g>
+
+                        <!-- Labels -->
+                        <g font-family="inherit" font-size="12" fill="#6b7280" font-weight="700">
+                            <text x="50" y="255" text-anchor="middle">May</text>
+                            <text x="146" y="255" text-anchor="middle">Apr</text>
+                            <text x="242" y="255" text-anchor="middle">May</text>
+                            <text x="338" y="255" text-anchor="middle">Jun</text>
+                            <text x="434" y="255" text-anchor="middle">Jul</text>
+                            <text x="530" y="255" text-anchor="middle">Aug</text>
+                            <text x="626" y="255" text-anchor="middle">Sep</text>
+                            <text x="740" y="255" text-anchor="middle">Oct</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Stock Status -->
+            <div class="card stock">
+                <div class="card-head">
+                    <h3>Stock Status</h3>
+                </div>
+                <div class="chart">
+                    <!-- Stacked bars via SVG -->
+                    <svg class="svg" viewBox="0 0 520 260" role="img" aria-label="Stock status stacked bar chart">
+                        <rect x="0" y="0" width="520" height="260" fill="#ffffff" />
+                        <g stroke="#e7ebf3" stroke-width="1">
+                            <line x1="50" y1="40" x2="500" y2="40" />
+                            <line x1="50" y1="90" x2="500" y2="90" />
+                            <line x1="50" y1="140" x2="500" y2="140" />
+                            <line x1="50" y1="190" x2="500" y2="190" />
+                            <line x1="50" y1="240" x2="500" y2="240" />
+                            <line x1="50" y1="40" x2="50" y2="240" />
+                        </g>
+
+                        <!-- Bars (Item A/B/C) -->
+                        <!-- Item A -->
+                        <g>
+                            <rect x="95" y="130" width="72" height="110" rx="8" fill="#2f7cf6" opacity="0.95" />
+                            <rect x="95" y="95" width="72" height="35" rx="8" fill="#ef4444" opacity="0.85" />
+                            <rect x="95" y="70" width="72" height="25" rx="8" fill="#f59e0b" opacity="0.9" />
+                            <rect x="95" y="50" width="72" height="20" rx="8" fill="#22c55e" opacity="0.9" />
+                        </g>
+
+                        <!-- Item B -->
+                        <g>
+                            <rect x="224" y="150" width="72" height="90" rx="8" fill="#2f7cf6" opacity="0.95" />
+                            <rect x="224" y="125" width="72" height="25" rx="8" fill="#ef4444" opacity="0.85" />
+                            <rect x="224" y="105" width="72" height="20" rx="8" fill="#f59e0b" opacity="0.9" />
+                        </g>
+
+                        <!-- Item C -->
+                        <g>
+                            <rect x="353" y="165" width="72" height="75" rx="8" fill="#2f7cf6" opacity="0.95" />
+                            <rect x="353" y="145" width="72" height="20" rx="8" fill="#ef4444" opacity="0.85" />
+                            <rect x="353" y="125" width="72" height="20" rx="8" fill="#f59e0b" opacity="0.9" />
+                        </g>
+
+                        <!-- X labels -->
+                        <g font-family="inherit" font-size="12" fill="#6b7280" font-weight="800">
+                            <text x="131" y="255" text-anchor="middle">Item A</text>
+                            <text x="260" y="255" text-anchor="middle">Item B</text>
+                            <text x="389" y="255" text-anchor="middle">Item C</text>
+                        </g>
+                    </svg>
+                </div>
+                <div class="legend">
+                    <span><span class="dot" style="background:#22c55e"></span>Low</span>
+                    <span><span class="dot" style="background:#ef4444"></span>Overstock</span>
+                    <span><span class="dot" style="background:#f59e0b"></span>Normal</span>
+                    <span><span class="dot" style="background:#2f7cf6"></span>Available</span>
+                </div>
+            </div>
+
+            <!-- Receivables Aging -->
+            <div class="card aging">
+                <div class="card-head">
+                    <h3>Receivables Aging</h3>
+                </div>
+                <div class="chart">
+                    <svg class="svg" viewBox="0 0 760 240" role="img" aria-label="Receivables aging bar chart">
+                        <rect x="0" y="0" width="760" height="240" fill="#ffffff" />
+                        <g stroke="#e7ebf3" stroke-width="1">
+                            <line x1="50" y1="30" x2="740" y2="30" />
+                            <line x1="50" y1="80" x2="740" y2="80" />
+                            <line x1="50" y1="130" x2="740" y2="130" />
+                            <line x1="50" y1="180" x2="740" y2="180" />
+                            <line x1="50" y1="220" x2="740" y2="220" />
+                            <line x1="50" y1="30" x2="50" y2="220" />
+                        </g>
+
+                        <!-- Bars -->
+                        <rect x="105" y="55" width="90" height="165" rx="10" fill="#2f7cf6" opacity="0.95" />
+                        <rect x="260" y="95" width="90" height="125" rx="10" fill="#2f7cf6" opacity="0.75" />
+                        <rect x="415" y="115" width="90" height="105" rx="10" fill="#2f7cf6" opacity="0.6" />
+                        <rect x="570" y="145" width="90" height="75" rx="10" fill="#2f7cf6" opacity="0.45" />
+
+                        <!-- Small green toppers -->
+                        <rect x="260" y="80" width="90" height="15" rx="10" fill="#22c55e" opacity="0.9" />
+                        <rect x="415" y="100" width="90" height="15" rx="10" fill="#22c55e" opacity="0.9" />
+                        <rect x="570" y="130" width="90" height="15" rx="10" fill="#22c55e" opacity="0.9" />
+
+                        <!-- Labels -->
+                        <g font-family="inherit" font-size="12" fill="#6b7280" font-weight="800">
+                            <text x="150" y="236" text-anchor="middle">Current</text>
+                            <text x="305" y="236" text-anchor="middle">1-30 Days</text>
+                            <text x="460" y="236" text-anchor="middle">31-60 Days</text>
+                            <text x="615" y="236" text-anchor="middle">Over 60 Days</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- AI Insights -->
+            <div class="card insights">
+                <div class="card-head">
+                    <h3>AI Insights</h3>
+                </div>
+                <div class="insight-list">
+                    <div class="insight">
+                        <div class="warn">!</div>
+                        <p>2 customers likely to delay payments.</p>
+                    </div>
+                    <div class="insight">
+                        <div class="warn">!</div>
+                        <p>Item C may go out of stock in 7 days.</p>
+                    </div>
+                    <div class="insight">
+                        <div class="warn">!</div>
+                        <p>Purchase costs increased 8.5% last month.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Receivables Priority List -->
+            <div class="card table">
+                <div class="card-head">
+                    <h3>Receivables Priority List</h3>
+                    <div class="meta">Outstanding • Expected Payment • Risk Level • Action</div>
+                </div>
+
+                <div style="overflow:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="min-width:220px;">Customer</th>
+                                <th style="min-width:140px;">Outstanding</th>
+                                <th style="min-width:160px;">Expected Payment</th>
+                                <th style="min-width:140px;">Risk Level</th>
+                                <th style="min-width:140px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="Customer">ABC Traders</td>
+                                <td data-label="Outstanding">₹ 2,80,000</td>
+                                <td data-label="Expected Payment">18 Feb 2024</td>
+                                <td data-label="Risk Level">
+                                    <span class="risk high"><span class="r-dot"></span>High</span>
+                                </td>
+                                <td data-label="Action"><span class="btn call">Call</span></td>
+                            </tr>
+                            <tr>
+                                <td data-label="Customer">Sharma &amp; Co</td>
+                                <td data-label="Outstanding">₹ 1,75,000</td>
+                                <td data-label="Expected Payment">22 Feb 2024</td>
+                                <td data-label="Risk Level">
+                                    <span class="risk med"><span class="r-dot"></span>Medium</span>
+                                </td>
+                                <td data-label="Action"><span class="btn follow">Follow Up</span></td>
+                            </tr>
+                            <tr>
+                                <td data-label="Customer">Nexon Pvt Ltd</td>
+                                <td data-label="Outstanding">₹ 90,000</td>
+                                <td data-label="Expected Payment">15 Feb 2024</td>
+                                <td data-label="Risk Level">
+                                    <span class="risk low"><span class="r-dot"></span>Low</span>
+                                </td>
+                                <td data-label="Action"><span class="btn remind">Reminder</span></td>
+                            </tr>
+                            <tr>
+                                <td data-label="Customer">Global Enterprises</td>
+                                <td data-label="Outstanding">₹ 1,50,000</td>
+                                <td data-label="Expected Payment">10 Feb 2024</td>
+                                <td data-label="Risk Level">
+                                    <span class="risk high"><span class="r-dot"></span>High</span>
+                                </td>
+                                <td data-label="Action"><span class="btn call">Call</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
